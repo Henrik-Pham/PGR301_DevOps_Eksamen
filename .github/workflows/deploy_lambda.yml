@@ -1,0 +1,44 @@
+name: "Deploy SAM Application"
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  sam_deploy:
+    name: "Deploy SAM Application"
+    runs-on: ubuntu-latest
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_REGION: eu-west-1  # Set to your target AWS region
+
+    steps:
+      # Checkout the code from the repository
+      - name: Check out the repo
+        uses: actions/checkout@v3
+
+      # Install AWS CLI and AWS SAM CLI
+      - name: Install AWS CLI and SAM CLI
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y python3-pip
+          pip3 install awscli aws-sam-cli
+
+      # Configure AWS CLI with GitHub Secrets
+      - name: Configure AWS Credentials
+        run: |
+          aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
+          aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
+          aws configure set region $AWS_REGION
+
+      # Build the SAM application
+      - name: Build SAM application
+        run: sam build
+
+      # Deploy the SAM application
+      - name: Deploy SAM application
+        run: |
+          sam deploy --stack-name ka37 --region $AWS_REGION --no-confirm-changeset --capabilities CAPABILITY_IAM
