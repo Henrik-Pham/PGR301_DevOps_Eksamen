@@ -29,14 +29,14 @@ jobs:
       # Initialize Terraform
       - name: Terraform Init
         id: init
-        working-directory: ./path/to/terraform/files # Update to the actual path of your Terraform files
+        working-directory: ./terraform # Update to the actual path of your Terraform files
         run: terraform init
 
       # Plan changes on non-main branches
       - name: Terraform Plan
         if: github.ref != 'refs/heads/main'
         id: plan
-        working-directory: ./path/to/terraform/files # Update to the actual path of your Terraform files
+        working-directory: ./terraform # Update to the actual path of your Terraform files
         run: terraform plan -var="prefix=$PREFIX" -no-color
         continue-on-error: true
 
@@ -48,5 +48,5 @@ jobs:
       # Apply changes on the main branch
       - name: Terraform Apply
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-        working-directory: ./path/to/terraform/files # Update to the actual path of your Terraform files
+        working-directory: ./terraform # Update to the actual path of your Terraform files
         run: terraform apply -var="prefix=$PREFIX" -auto-approve
