@@ -21,15 +21,6 @@ jobs:
       - name: Check out the repo
         uses: actions/checkout@v3
 
-      # Install AWS SAM CLI
-      - name: Install SAM CLI
-        run: |
-          sudo apt-get update -y
-          sudo apt-get install -y unzip
-          curl -Lo sam_installation.zip https://github.com/aws/aws-sam-cli/releases/latest/download/aws-sam-cli-linux-x86_64.zip
-          unzip sam_installation.zip -d sam-installation
-          sudo ./sam-installation/install
-
       # Verify SAM CLI installation
       - name: Verify SAM CLI installation
         run: sam --version
