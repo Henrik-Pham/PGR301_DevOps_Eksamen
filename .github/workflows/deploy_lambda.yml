@@ -21,6 +21,12 @@ jobs:
       - name: Check out the repo
         uses: actions/checkout@v3
 
+      # Install Python 3.8
+      - name: Install Python 3.8
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+
       # Verify SAM CLI installation
       - name: Verify SAM CLI installation
         run: sam --version
@@ -28,7 +34,7 @@ jobs:
       # Build the SAM application
       - name: Build SAM application
         run: sam build -t sam_lambda/ka37/template.yaml
-        
+
       # Deploy the SAM application
       - name: Deploy SAM application
         run: |
@@ -36,5 +42,3 @@ jobs:
             --template-file sam_lambda/ka37/.aws-sam/build/template.yaml \
             --stack-name ka37-stack \
             --region $AWS_REGION \
-            --capabilities CAPABILITY_IAM \
-            --no-fail-on-empty-changeset
