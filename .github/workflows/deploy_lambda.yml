@@ -35,12 +35,13 @@ jobs:
       - name: Build SAM application
         run: sam build -t sam_lambda/ka37/template.yaml
 
-      # Deploy the SAM application
+            # Deploy the SAM application
       - name: Deploy SAM application
         run: |
           sam deploy \
             --template-file .aws-sam/build/template.yaml \
             --stack-name ka37-stack \
+            --s3-bucket pgr301-couch-explorers \
             --region $AWS_REGION \
             --capabilities CAPABILITY_IAM \
             --no-fail-on-empty-changeset
