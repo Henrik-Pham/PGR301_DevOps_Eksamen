@@ -27,8 +27,8 @@ jobs:
 
       # Build the SAM application
       - name: Build SAM application
-        run: sam build -t sam_lambda/ka37/template.yml
-
+        run: sam build -t sam_lambda/ka37/template.yaml
+        
       # Deploy the SAM application
       - name: Deploy SAM application
         run: |
