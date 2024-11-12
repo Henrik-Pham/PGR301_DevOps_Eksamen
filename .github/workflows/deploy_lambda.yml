@@ -1,47 +1,48 @@
-name: "SAM Deployment"
+name: "Terraform Deployment"
 
 on:
   push:
     branches:
       - main
+      - '*'
   pull_request:
 
 jobs:
-  deploy_sam:
-    name: "Build and Deploy SAM Application"
+  terraform:
+    name: "Terraform Plan or Apply"
     runs-on: ubuntu-latest
     env:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       AWS_REGION: eu-west-1
-      PREFIX: ka37  # Your candidate number or project identifier
-
+      PREFIX: ka37  # Set this to your candidate number or project identifier
     steps:
       # Checkout the repository
       - name: Check out the repo
         uses: actions/checkout@v3
 
-      # Install Python 3.8
-      - name: Install Python 3.8
-        uses: actions/setup-python@v2
-        with:
-          python-version: 3.8
+      # Set up Terraform CLI
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
 
-      # Verify SAM CLI installation
-      - name: Verify SAM CLI installation
-        run: sam --version
+      # Initialize Terraform
+      - name: Terraform Init
+        id: init
+        run: terraform init
 
-      # Build the SAM application
-      - name: Build SAM application
-        run: sam build -t sam_lambda/ka37/template.yaml
+      # Plan changes on non-main branches
+      - name: Terraform Plan
+        if: github.ref != 'refs/heads/main'
+        id: plan
+        run: terraform plan -var="prefix=$PREFIX" -no-color
+        continue-on-error: true
 
-            # Deploy the SAM application
-      - name: Deploy SAM application
-        run: |
-          sam deploy \
-            --template-file .aws-sam/build/template.yaml \
-            --stack-name ka37-stack \
-            --s3-bucket pgr301-couch-explorers \
-            --region $AWS_REGION \
-            --capabilities CAPABILITY_IAM \
-            --no-fail-on-empty-changeset
+      # Check the plan status on non-main branches
+      - name: Terraform Plan Status
+        if: github.ref != 'refs/heads/main' && steps.plan.outcome == 'failure'
+        run: exit 1
+
+      # Apply changes on the main branch
+      - name: Terraform Apply
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        run: terraform apply -var="prefix=$PREFIX" -auto-approve
