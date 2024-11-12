@@ -28,14 +28,12 @@ jobs:
 
       # Initialize Terraform
       - name: Terraform Init
-        id: init
         working-directory: ./terraform # Update to the actual path of your Terraform files
         run: terraform init
 
       # Plan changes on non-main branches
       - name: Terraform Plan
         if: github.ref != 'refs/heads/main'
-        id: plan
         working-directory: ./terraform # Update to the actual path of your Terraform files
         run: terraform plan -var="prefix=$PREFIX" -no-color
         continue-on-error: true
