@@ -1,4 +1,4 @@
-name: "Deploy SAM Application"
+name: "SAM Deployment"
 
 on:
   push:
@@ -42,3 +42,5 @@ jobs:
             --template-file sam_lambda/ka37/.aws-sam/build/template.yaml \
             --stack-name ka37-stack \
             --region $AWS_REGION \
+            --capabilities CAPABILITY_IAM \
+            --no-fail-on-empty-changeset
