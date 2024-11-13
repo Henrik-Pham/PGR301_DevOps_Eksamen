@@ -10,8 +10,8 @@ jobs:
   terraform:
     runs-on: ubuntu-latest
     env:
-      TF_VAR_aws_region: ${{ secrets.AWS_REGION }}
-      TF_VAR_prefix: "ka37"  # Example prefix, customize if needed
+      TF_VAR_aws_region: "eu-west-1"  # Directly setting the region here
+      TF_VAR_prefix: "ka37"           # Example prefix, customize if needed
 
     steps:
       - name: Checkout code
@@ -27,7 +27,7 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ secrets.AWS_REGION }}  # Explicitly set here
+          aws-region: "eu-west-1"  # Hardcoding the region here
 
       - name: Initialize Terraform
         run: terraform init
