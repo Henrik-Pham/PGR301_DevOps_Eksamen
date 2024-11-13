@@ -10,8 +10,8 @@ jobs:
   terraform:
     runs-on: ubuntu-latest
     env:
-      TF_VAR_aws_region: "eu-west-1"  # Directly setting the region here
-      TF_VAR_prefix: "ka37"           # Example prefix, customize if needed
+      TF_VAR_aws_region: "eu-west-1"
+      TF_VAR_prefix: "ka37"
 
     steps:
       - name: Checkout code
@@ -27,25 +27,32 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: "eu-west-1"  # Hardcoding the region here
+          aws-region: "eu-west-1"
+
+      # Zip the Lambda function code
+      - name: Zip Lambda Function
+        working-directory: ./infra # Adjust if needed
+        run: zip lambda_sqs.zip lambda_sqs.py
 
       - name: Initialize Terraform
         id: init
-        working-directory: ./infra 
+        working-directory: ./infra
         run: terraform init
 
       - name: Terraform Format Check
+        working-directory: ./infra
         run: terraform fmt -check
 
       - name: Terraform Validate
+        working-directory: ./infra
         run: terraform validate
 
       - name: Terraform Plan
         if: github.ref != 'refs/heads/main'
-        working-directory: ./infra 
+        working-directory: ./infra
         run: terraform plan -var="prefix=${{ env.TF_VAR_prefix }}"
 
       - name: Terraform Apply
         if: github.ref == 'refs/heads/main'
-        working-directory: ./infra 
+        working-directory: ./infra
         run: terraform apply -auto-approve -var="prefix=${{ env.TF_VAR_prefix }}"
