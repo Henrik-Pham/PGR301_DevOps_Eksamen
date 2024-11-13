@@ -48,6 +48,7 @@ def lambda_handler(event, context):
     seed = random.randint(0, 2147483647)
     s3_image_path = f"{CANDIDATE_NUMBER}/images/titan_{seed}.png"
     print(f"Generated S3 image path: {s3_image_path}")
+    
 
     # Create the request payload for image generation
     native_request = {
