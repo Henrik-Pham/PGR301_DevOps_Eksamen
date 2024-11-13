@@ -4,7 +4,8 @@ on:
   push:
     branches:
       - main
-      - '*'
+      - '*'  # Ensures the workflow triggers on any branch, including feature branches
+
 
 jobs:
   terraform:
@@ -16,6 +17,9 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
+        
+      - name: Show Branch Name
+        run: echo "Running on branch: ${{ github.ref }}"
 
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v2
@@ -55,3 +59,4 @@ jobs:
         if: github.ref == 'refs/heads/main'
         working-directory: ./infra
         run: terraform apply -auto-approve -var="prefix=${{ env.TF_VAR_prefix }}"
+        
