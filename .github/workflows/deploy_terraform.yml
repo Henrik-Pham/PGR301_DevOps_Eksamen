@@ -22,6 +22,9 @@ jobs:
         with:
           terraform_version: 1.9.0  
 
+      - name: Change to Terraform directory
+        run: cd infra  # Change this if your terraform files are in a different folder
+
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v2
         with:
@@ -30,18 +33,28 @@ jobs:
           aws-region: "eu-west-1"  # Hardcoding the region here
 
       - name: Initialize Terraform
-        run: terraform init
+        run: |
+          cd infra
+          terraform init
 
       - name: Terraform Format Check
-        run: terraform fmt -check
+        run: |
+          cd infra
+          terraform fmt -check
 
       - name: Terraform Validate
-        run: terraform validate
+        run: |
+          cd infra
+          terraform validate
 
       - name: Terraform Plan
         if: github.ref != 'refs/heads/main'
-        run: terraform plan -var="prefix=${{ env.TF_VAR_prefix }}"
+        run: |
+          cd infra
+          terraform plan -var="prefix=${{ env.TF_VAR_prefix }}"
 
       - name: Terraform Apply
         if: github.ref == 'refs/heads/main'
-        run: terraform apply -auto-approve -var="prefix=${{ env.TF_VAR_prefix }}"
+        run: |
+          cd infra
+          terraform apply -auto-approve -var="prefix=${{ env.TF_VAR_prefix }}"
