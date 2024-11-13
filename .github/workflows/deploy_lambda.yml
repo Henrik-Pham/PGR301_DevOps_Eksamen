@@ -1,50 +1,48 @@
-name: "Terraform Deployment"
+name: Terraform Deploy
 
 on:
   push:
     branches:
       - main
       - '*'
-  pull_request:
 
 jobs:
   terraform:
-    name: "Terraform Plan or Apply"
     runs-on: ubuntu-latest
     env:
-      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      AWS_REGION: eu-west-1
-      PREFIX: ka37  # Set this to your candidate number or project identifier
+      AWS_REGION: ${{ secrets.AWS_REGION }}
+      TF_VAR_aws_region: ${{ secrets.AWS_REGION }}
+      TF_VAR_prefix: "ka37"  # Example prefix, customize if needed
 
     steps:
-      # Checkout the repository
-      - name: Check out the repo
+      - name: Checkout code
         uses: actions/checkout@v3
 
-      # Set up Terraform CLI
-      - name: Setup Terraform
+      - name: Set up Terraform
         uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.9.0  # Adjust if needed
 
-      # Initialize Terraform
-      - name: Terraform Init
-        working-directory: ./terraform # Update to the actual path of your Terraform files
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Initialize Terraform
         run: terraform init
 
-      # Plan changes on non-main branches
+      - name: Terraform Format Check
+        run: terraform fmt -check
+
+      - name: Terraform Validate
+        run: terraform validate
+
       - name: Terraform Plan
         if: github.ref != 'refs/heads/main'
-        working-directory: ./terraform # Update to the actual path of your Terraform files
-        run: terraform plan -var="prefix=$PREFIX" -no-color
-        continue-on-error: true
+        run: terraform plan -var="prefix=${{ env.TF_VAR_prefix }}"
 
-      # Check the plan status on non-main branches
-      - name: Terraform Plan Status
-        if: github.ref != 'refs/heads/main' && steps.plan.outcome == 'failure'
-        run: exit 1
-
-      # Apply changes on the main branch
       - name: Terraform Apply
-        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-        working-directory: ./terraform # Update to the actual path of your Terraform files
-        run: terraform apply -var="prefix=$PREFIX" -auto-approve
+        if: github.ref == 'refs/heads/main'
+        run: terraform apply -auto-approve -var="prefix=${{ env.TF_VAR_prefix }}"
