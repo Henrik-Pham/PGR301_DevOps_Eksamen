@@ -6,7 +6,6 @@ on:
       - main
       - '*'  # Ensures the workflow triggers on any branch, including feature branches
 
-
 jobs:
   terraform:
     runs-on: ubuntu-latest
@@ -17,6 +16,9 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
+      
+      - name: Show Branch Name
+        run: echo "Running on branch: ${{ github.ref }}"
 
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v2
@@ -35,7 +37,6 @@ jobs:
         run: zip lambda_sqs.zip lambda_sqs.py
 
       - name: Initialize Terraform
-        id: init
         working-directory: ./infra
         run: terraform init
 
@@ -56,4 +57,3 @@ jobs:
         if: github.ref == 'refs/heads/main'
         working-directory: ./infra
         run: terraform apply -auto-approve -var="prefix=${{ env.TF_VAR_prefix }}"
-        
