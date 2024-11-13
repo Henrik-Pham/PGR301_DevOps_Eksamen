@@ -25,8 +25,8 @@ data "aws_s3_bucket" "images_bucket" {
 
 # SQS Queue
 resource "aws_sqs_queue" "image_generation_queue" {
-  name                      = "${var.prefix}_image_generation_queue"
-  message_retention_seconds = 86400
+  name                       = "${var.prefix}_image_generation_queue"
+  message_retention_seconds  = 86400
   visibility_timeout_seconds = 60
 }
 
@@ -36,38 +36,38 @@ resource "aws_iam_role" "lambda_exec_role" {
   assume_role_policy = jsonencode({
     Version = "2012-10-17",
     Statement = [{
-      Action = "sts:AssumeRole",
+      Action    = "sts:AssumeRole",
       Principal = { Service = "lambda.amazonaws.com" },
-      Effect = "Allow",
+      Effect    = "Allow",
     }]
   })
 }
 
 # IAM Policy for Lambda to Access S3, SQS, Bedrock, and CloudWatch Logs
 resource "aws_iam_role_policy" "lambda_policy" {
-  name   = "${var.prefix}_lambda_policy"
-  role   = aws_iam_role.lambda_exec_role.id
+  name = "${var.prefix}_lambda_policy"
+  role = aws_iam_role.lambda_exec_role.id
   policy = jsonencode({
     Version = "2012-10-17",
     Statement = [
       {
-        Effect = "Allow",
-        Action = ["s3:PutObject", "s3:GetObject"],
+        Effect   = "Allow",
+        Action   = ["s3:PutObject", "s3:GetObject"],
         Resource = "${data.aws_s3_bucket.images_bucket.arn}/*"
       },
       {
-        Effect = "Allow",
-        Action = ["sqs:ReceiveMessage", "sqs:DeleteMessage", "sqs:GetQueueAttributes"],
+        Effect   = "Allow",
+        Action   = ["sqs:ReceiveMessage", "sqs:DeleteMessage", "sqs:GetQueueAttributes"],
         Resource = aws_sqs_queue.image_generation_queue.arn
       },
       {
-        Effect = "Allow",
-        Action = "bedrock:InvokeModel",
+        Effect   = "Allow",
+        Action   = "bedrock:InvokeModel",
         Resource = "arn:aws:bedrock:us-east-1::foundation-model/amazon.titan-image-generator-v1"
       },
       {
-        Effect = "Allow",
-        Action = ["logs:CreateLogGroup", "logs:CreateLogStream", "logs:PutLogEvents"],
+        Effect   = "Allow",
+        Action   = ["logs:CreateLogGroup", "logs:CreateLogStream", "logs:PutLogEvents"],
         Resource = "arn:aws:logs:*:*:*"
       }
     ]
@@ -77,7 +77,7 @@ resource "aws_iam_role_policy" "lambda_policy" {
 # Lambda Function for Image Processing
 resource "aws_lambda_function" "image_processing_lambda" {
   function_name = "${var.prefix}_image_processing_lambda"
-  filename      = "lambda_sqs.zip"       # Ensure this zip file is in the current directory
+  filename      = "lambda_sqs.zip" # Ensure this zip file is in the current directory
   handler       = "lambda_sqs.lambda_handler"
   runtime       = "python3.8"
   role          = aws_iam_role.lambda_exec_role.arn
