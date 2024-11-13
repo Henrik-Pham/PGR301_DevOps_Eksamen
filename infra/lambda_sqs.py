@@ -22,7 +22,7 @@ def lambda_handler(event, context):
             
             # Generate a random seed and S3 path for the image
             seed = random.randint(0, 2147483647)
-            s3_image_path = f"ka37/images/titan_{seed}.png"  # Replace 'ka37' with your candidate number or prefix if needed
+            s3_image_path = f"ka37/images/titan_{seed}.png"
             print(f"Generated S3 image path: {s3_image_path}")
 
             # Prepare the request payload for image generation

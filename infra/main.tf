@@ -1,7 +1,7 @@
 terraform {
   required_version = ">= 1.9"
   backend "s3" {
-    bucket = "pgr301-2024-terraform-state"  # Your Terraform state bucket
+    bucket = "pgr301-2024-terraform-state"
     key    = "infra/terraform.tfstate"
     region = "eu-west-1"
   }
