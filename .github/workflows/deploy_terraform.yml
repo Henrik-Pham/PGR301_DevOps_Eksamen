@@ -31,7 +31,7 @@ jobs:
 
       # Zip the Lambda function code
       - name: Zip Lambda Function
-        working-directory: ./infra # Adjust if needed
+        working-directory: ./infra
         run: zip lambda_sqs.zip lambda_sqs.py
 
       - name: Initialize Terraform

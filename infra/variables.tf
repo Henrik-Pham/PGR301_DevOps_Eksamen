@@ -16,9 +16,11 @@ variable "notification_email" {
 }
 
 variable "AgeOfOldestMessage_Alarm" {
-  description = "Threshold in seconds for ApproximateAgeOfOldestMessage"
-  type        = number
+    description = "Threshold in seconds for ApproximateAgeOfOldestMessage"
+    type        = number
 }
+
+
 
 
 
