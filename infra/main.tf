@@ -98,3 +98,36 @@ resource "aws_lambda_event_source_mapping" "sqs_event" {
   function_name    = aws_lambda_function.image_processing_lambda.arn
   batch_size       = 1
 }
+
+# SNS Topic for Notifications
+resource "aws_sns_topic" "sqs_delay_alarm_topic" {
+  name = "${var.prefix}_sqs_delay_alarm_topic"
+}
+
+# SNS Topic Subscription for Email
+resource "aws_sns_topic_subscription" "sqs_delay_email_subscription" {
+  topic_arn = aws_sns_topic.sqs_delay_alarm_topic.arn
+  protocol  = "email"
+  endpoint  = var.notification_email
+}
+
+# CloudWatch Alarm for ApproximateAgeOfOldestMessage
+resource "aws_cloudwatch_metric_alarm" "sqs_approximate_age_alarm" {
+  alarm_name          = "${var.prefix}_sqs_approximate_age_alarm"
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods  = 1
+  metric_name         = "ApproximateAgeOfOldestMessage"
+  namespace           = "AWS/SQS"
+  period              = 60
+  statistic           = "Maximum"
+  threshold           = var.AgeOfOldestMessage_Alarm
+
+  dimensions = {
+    QueueName = aws_sqs_queue.image_generation_queue.name
+  }
+
+  alarm_actions = [
+    aws_sns_topic.sqs_delay_alarm_topic.arn
+  ]
+}
+

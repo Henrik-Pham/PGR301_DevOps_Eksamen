@@ -9,3 +9,17 @@ variable "aws_region" {
   type        = string
   default     = "eu-west-1"
 }
+
+variable "notification_email" {
+  description = "Email address to receive alarm notifications"
+  type        = string
+}
+
+variable "AgeOfOldestMessage_Alarm" {
+  description = "Threshold in seconds for ApproximateAgeOfOldestMessage"
+  type        = number
+}
+
+
+
+
