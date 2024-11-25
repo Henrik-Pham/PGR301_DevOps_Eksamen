@@ -37,6 +37,11 @@ jobs:
         id: init
         working-directory: ./infra
         run: terraform init
+        
+      - name: Import Existing Role (if exists)
+        if: always()
+        working-directory: ./infra
+        run: terraform import aws_iam_role.lambda_exec_role ka37_lambda_exec_role || echo "Role already managed"
 
       - name: Terraform Format Check
         working-directory: ./infra

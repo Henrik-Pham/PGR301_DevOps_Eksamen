@@ -30,19 +30,27 @@ resource "aws_sqs_queue" "image_generation_queue" {
 
 resource "aws_iam_role" "lambda_exec_role" {
   name = "${var.prefix}_lambda_exec_role"
+
   assume_role_policy = jsonencode({
     Version = "2012-10-17",
-    Statement = [{
-      Action    = "sts:AssumeRole",
-      Principal = { Service = "lambda.amazonaws.com" },
-      Effect    = "Allow",
-    }]
+    Statement = [
+      {
+        Action    = "sts:AssumeRole",
+        Principal = { Service = "lambda.amazonaws.com" },
+        Effect    = "Allow"
+      }
+    ]
   })
+
+  lifecycle {
+    prevent_destroy = true
+  }
 }
 
 resource "aws_iam_role_policy" "lambda_policy" {
   name = "${var.prefix}_lambda_policy"
   role = aws_iam_role.lambda_exec_role.id
+
   policy = jsonencode({
     Version = "2012-10-17",
     Statement = [
@@ -121,4 +129,3 @@ resource "aws_cloudwatch_metric_alarm" "sqs_approximate_age_alarm" {
     aws_sns_topic.sqs_delay_alarm_topic.arn
   ]
 }
-
