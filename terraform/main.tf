@@ -35,7 +35,8 @@ resource "aws_iam_role_policy" "lambda_policy" {
       {
         Effect   = "Allow",
         Action   = ["s3:PutObject", "s3:GetObject"],
-        Resource = "arn:aws:s3:::pgr301-couch-explorers/*" 
+        Resource = "arn:aws:s3:::pgr301-couch-explorers/*"
+      },
       {
         Effect   = "Allow",
         Action   = "bedrock:InvokeModel",
@@ -44,3 +45,4 @@ resource "aws_iam_role_policy" "lambda_policy" {
     ]
   })
 }
+

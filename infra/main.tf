@@ -72,7 +72,7 @@ resource "aws_iam_role_policy" "lambda_policy" {
 
 resource "aws_lambda_function" "image_processing_lambda" {
   function_name = "${var.prefix}_image_processing_lambda"
-  filename      = "lambda_sqs.zip" 
+  filename      = "lambda_sqs.zip"
   handler       = "lambda_sqs.lambda_handler"
   runtime       = "python3.8"
   role          = aws_iam_role.lambda_exec_role.arn
