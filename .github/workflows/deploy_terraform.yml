@@ -29,7 +29,6 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: "eu-west-1"
 
-      # Zip the Lambda function code
       - name: Zip Lambda Function
         working-directory: ./infra
         run: zip lambda_sqs.zip lambda_sqs.py

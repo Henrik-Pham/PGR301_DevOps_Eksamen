@@ -19,9 +19,3 @@ variable "AgeOfOldestMessage_Alarm" {
   description = "Threshold in seconds for ApproximateAgeOfOldestMessage"
   type        = number
 }
-
-
-
-
-
-
